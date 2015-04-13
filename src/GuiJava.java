@@ -35,7 +35,9 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
     JFrame jfM;
     ArrayList  productosArray, clientesArray, ticketArray;
     JTextArea areaProducto, areaCliente,areaTicket;
+    JTextArea area_Productos;
     String rutaArchivo="C:/Users/panzer/Desktop/eclipseProyectos/tpv_uned_Roberto_Velez/";
+    String cadenaProductosTicket;
     
     public GuiJava(){
     	productosArray= new ArrayList();
@@ -313,7 +315,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		{
 			public void mouseClicked(MouseEvent arg0) {
 				
-				//importarClientes();
+				importarTickets();
 				
 			}
 		});
@@ -325,7 +327,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		{
 			public void mouseClicked(MouseEvent arg0) {
 				
-				// exportarClientes();			
+				 exportarTickets();			
 			}
 		});
 		PanelVentas.add(exportar);
@@ -479,6 +481,45 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
        }
        actualizarProductos();
 	}
+	public void exportarTickets()
+	{
+		FileOutputStream fichero = null;
+        ObjectOutputStream salida = null;
+        Ticket p;
+        cantidad c;
+        
+        /*Meter datso en arrayList*/
+         
+        String continuar="si";
+		
+		 try {
+			
+			 String ruta=rutaArchivo+"Tickets.txt";
+	            fichero = new FileOutputStream(ruta);
+	            salida = new ObjectOutputStream(fichero);
+	            c=new cantidad(ticketArray.size());
+	            salida.writeObject(c);
+	            //System.out.printaln("exportar "+c.cant);
+	          for(int i=0;i<ticketArray.size();i++)
+	          {
+	        	  
+	        	  salida.writeObject(ticketArray.get(i));
+	          }        
+		 } catch (FileNotFoundException e) {
+	            System.out.println(e.getMessage());
+	        } catch (IOException e) {
+	            System.out.println(e.getMessage());
+	        } finally {
+	            try {
+	                if(fichero!=null) fichero.close();
+	                if(salida!=null) salida.close();
+	            } catch (IOException e) {
+	                System.out.println(e.getMessage());
+	            }
+	        }
+		 actualizarClientes();
+	}
+	
 	public void importarClientes()
 	{
 		 
@@ -501,7 +542,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
            
             while(cantidad>0)
             {
-            	System.out.println("HOLA MUNDO");
+            	//System.out.println("HOLA MUNDO");
                	cli = (Clientes) entrada.readObject();
             	clientesArray.add(cli);
             	cantidad--;
@@ -530,6 +571,58 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
             }
         }
         actualizarClientes();
+	}
+	public void importarTickets()
+	{
+		 
+	
+		
+		 Ticket tick;
+	     cantidad c;
+		FileInputStream ficheroLeer = null;
+        ObjectInputStream entrada = null;		     
+
+        try {
+        	String ruta=rutaArchivo+"Tickets.txt";
+       	 
+        	ticketArray.clear();
+            ficheroLeer = new FileInputStream(ruta);
+            entrada = new ObjectInputStream(ficheroLeer);
+            c= (cantidad) entrada.readObject();
+
+            int cantidad=c.cant;
+           
+            while(cantidad>0)
+            {
+           
+            	tick = (Ticket) entrada.readObject();
+            	ticketArray.add(tick);
+            	cantidad--;
+            }
+         
+           
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+           
+        } catch (ClassNotFoundException e) {
+            System.out.println(e.getMessage());
+           
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        } finally {
+            try {
+                if (ficheroLeer != null) {
+                	ficheroLeer.close();
+                }
+                if (entrada != null) {
+                    entrada.close();
+                }
+            } catch (IOException e) {
+                System.out.println(e.getMessage());
+                
+            }
+        }
+        actualizarTickets();
 	}
 	public void modificarProducto(String Texto)
 	{
@@ -898,12 +991,12 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 					area_Buscador_Cliente.setText(cadena);
 			}
 		});
-    	JTextArea area_Productos= new JTextArea();
+    	
     	area_Productos = new JTextArea();
     	area_Productos.setBounds(450, 100, 300, 300);
     	area_Productos.setAutoscrolls(true);
     	frame.add(area_Productos);
-    	area_Productos.setText("Productos");
+    	String cadenaProdu="Productos\n Denominacion     Precio Cantidad\n ";
     	JButton Nuevo_producto= new JButton("Producto nuevo");
     	Nuevo_producto.addMouseListener(new MouseAdapter()
 		{
@@ -946,7 +1039,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 								{
 									if(c.getDescripcion().indexOf(producto.getText())!=-1)
 									{
-										cadena=cadena+ c.getCodigo()+"    " +c.getDescripcion() +"\n";
+										cadena=cadena+ c.getCodigo()+"    " +c.getDescripcion() + c.getcantidadStock() +"\n";
 									}
 								
 								}
@@ -969,7 +1062,37 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 				{
 					public void mouseClicked(MouseEvent arg0) 
 					{
+						System.out.println("Aceptar producto");
+						Productos productoTicket ;
+						cantidad c;
 						
+						int IdProducto = Integer.parseInt(producto.getText());
+						int cantidadProducto= Integer.parseInt(cantidad.getText());
+						System.out.println( IdProducto  + "   "+cantidadProducto);
+						if(productosArray.size()>= IdProducto && cantidadProducto>0)
+						{
+							
+							productoTicket=(Productos) productosArray.get(IdProducto-1);
+							if(productoTicket.setDisminucionStock(cantidadProducto))
+							{
+								c= new cantidad(cantidadProducto);
+								productosTicket.add(productoTicket);
+								productosTicket.add(cantidadProducto);
+								cadenaProductosTicket=productoTicket.getDescripcion()+"    \t "+productoTicket.getPrecioConIva() +"\n ";
+								System.out.println("Todo ok ");
+							}
+							else
+							{
+								System.out.println("No hay cantidad en stock suficiente");						
+							}
+							
+						}
+						else
+						{
+							//error no existe producto p cantidad menor que 0
+						}
+						area_Productos.setText(cadenaProdu+cadenaProductosTicket);
+						ventana2.setVisible(false);
 						
 					}
 				});
@@ -987,19 +1110,26 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		{
 			public void mouseClicked(MouseEvent arg0) 
 			{
+				
 				Clientes clienteTicket ;
 				int IdCliente = Integer.parseInt(cliente.getText());
 				
-				if(clientesArray.size()<= IdCliente)
+				if(clientesArray.size()> IdCliente)
 				{
 					Ticket ticket= new Ticket((ticketArray.size()+1), (Clientes) clientesArray.get(IdCliente-1));
+					ticket.productos=productosArray;
+					ticketArray.add(ticket);
+					
+					//areaTicket
+					actualizarTickets();
 				}
 				else
 				{
 					//error no existe cliente
+					System.out.println("Cliente no existe");
 				}
 				
-				
+				frame.setVisible(false);
 			}
 		});
 		aceptar.setBounds(10, 700, 770, 40);
@@ -1046,11 +1176,11 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 	}
 	public void actualizarTickets()
 	{
-		 String cadena="Nombre\n";
+		 String cadena="Cliente  Total\n";
 	        
 	      	
 		 Ticket c;
-				Iterator<Ticket> it = clientesArray.iterator();
+				Iterator<Ticket> it = ticketArray.iterator();
 				while(it.hasNext())
 				{
 					c=it.next();
