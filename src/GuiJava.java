@@ -8,6 +8,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -29,36 +30,38 @@ import javax.swing.JTextField;
  
 public class GuiJava implements ActionListener{//implementando el listener de eventos
  
-    JPanel PanelProductos, PanelClientes, PanelVentas;
+    JPanel PanelProductos, PanelClientes, PanelVentas, PanelFacturas;
     JButton jb1, jb2, jb3, jbP1, jbP2, jbP3;   
     JMenu productosMenu;
     JFrame jfM;
     ArrayList  productosArray, clientesArray, ticketArray;
-    JTextArea areaProducto, areaCliente,areaTicket;
-    JTextArea area_Productos;
-    String rutaArchivo="C:/Users/panzer/Desktop/eclipseProyectos/tpv_uned_Roberto_Velez/";
+    JTextArea areaProducto, areaCliente,areaTicket, areaFactura , area_Productos;
+    String rutaArchivo="";
     String cadenaProductosTicket;
-    
+    boolean banderaMostrar;//para sacar facturas
     public GuiJava(){
+    	File fichero = new File("");
+    	rutaArchivo=fichero.getAbsolutePath();
+    	
     	productosArray= new ArrayList();
     	clientesArray=new ArrayList();
     	ticketArray=new ArrayList();
         jfM = new JFrame("JPanel En Java");  
         jfM.setLayout(null);
  
-        productos(); clientes(); ventas(); //invocamos los metodos que contienen los paneles 
+        productos(); clientes(); ventas(); facturas();//invocamos los metodos que contienen los paneles 
         PanelProductos.setVisible(false);
         PanelProductos.setLayout(null);
         PanelClientes.setVisible(false);
         PanelClientes.setLayout(null);
         PanelVentas.setLayout(null);
         PanelVentas.setVisible(false);
-        
-        
+        PanelFacturas.setVisible(false);
+        PanelFacturas.setLayout(null);
   
-        PanelProductos.setBounds(0, 0, 1200, 1200); PanelClientes.setBounds(0, 0, 1200, 1200); PanelVentas.setBounds(0, 0, 1200, 1200); 
+        PanelProductos.setBounds(0, 0, 1200, 1200); PanelClientes.setBounds(0, 0, 1200, 1200); PanelVentas.setBounds(0, 0, 1200, 1200);  PanelFacturas.setBounds(0, 0, 1200, 1200); 
         
-        jfM.add(PanelProductos); jfM.add(PanelClientes); jfM.add(PanelVentas); 
+        jfM.add(PanelProductos); jfM.add(PanelClientes); jfM.add(PanelVentas); jfM.add(PanelFacturas);
         jfM.setLocation(100, 50);
         jfM.setResizable(false);
         jfM.setVisible(true);
@@ -82,6 +85,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 	            	PanelProductos.setVisible(true); 
 	            	PanelClientes.setVisible(false);
 	            	PanelVentas.setVisible(false);
+	            	PanelFacturas.setVisible(false);
 			}
 		});
 		menu.add(productosMenu);
@@ -94,7 +98,8 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 			public void mouseClicked(MouseEvent arg0) {			
 	            	PanelProductos.setVisible(false); 
 	            	PanelClientes.setVisible(false);	           
-	            	PanelVentas.setVisible(true);			
+	            	PanelVentas.setVisible(true);	
+	            	PanelFacturas.setVisible(false);
 			}
 		});
 		menu.add(ventas);
@@ -105,7 +110,8 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 			public void mouseClicked(MouseEvent arg0) {
 				PanelProductos.setVisible(false); 
             	PanelClientes.setVisible(true);	   
-            	PanelVentas.setVisible(false);	
+            	PanelVentas.setVisible(false);
+            	PanelFacturas.setVisible(false);
 			}
 		});
 	
@@ -114,7 +120,10 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		facturacion.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent arg0) {
-				//////////////////////
+				PanelProductos.setVisible(false); 
+            	PanelClientes.setVisible(false);	   
+            	PanelVentas.setVisible(false);
+            	PanelFacturas.setVisible(true);
 			}
 		});
 	
@@ -296,7 +305,111 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		PanelClientes.add(modi);
 		PanelClientes.add(modificar);
 		
+			
 				
+		
+    }
+    public void facturas()
+    {
+    	PanelFacturas = new JPanel();
+    	JButton nuevaFactura= new JButton("nueva factura");
+    	nuevaFactura.setBounds(220, 25, 109, 23);
+    	nuevaFactura.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent arg0) {
+				
+				//NuevoCliente();	
+				
+				nuevaFactura();
+			}
+		});
+		PanelFacturas.add(nuevaFactura);
+		
+		areaFactura = new JTextArea();
+		areaFactura.setBounds(100, 100, 500, 500);
+		areaFactura.setAutoscrolls(true);
+		PanelFacturas.add(areaFactura);
+		
+		/*
+		areaCliente = new JTextArea();
+		areaCliente.setBounds(100, 100, 500, 500);
+		areaCliente.setAutoscrolls(true);
+		PanelClientes.add(areaCliente);
+		JButton importar= new JButton("importar clientes");
+		importar.setBounds(10, 25, 109, 23);
+		importar.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent arg0) {
+				
+				importarClientes();
+				
+			}
+		});
+		PanelClientes.add(importar);
+		
+		
+		JButton exportar= new JButton("exportar clientes");
+		exportar.setBounds(120, 25, 109, 23);
+		exportar.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent arg0) {
+				
+				 exportarClientes();			
+			}
+		});
+		PanelClientes.add(exportar);
+		JButton nuevoCliente= new JButton("nuevoCliente");
+		nuevoCliente.setBounds(220, 25, 109, 23);
+		nuevoCliente.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent arg0) {
+				
+				NuevoCliente();			
+			}
+		});
+		PanelClientes.add(nuevoCliente);
+		
+		JButton eliminar = new JButton("Eliminar");
+		eliminar.setBounds(630, 150, 139,23);
+		JTextField elimi = new JTextField();
+		elimi.setBounds(800,150,130,23);
+		PanelClientes.add(elimi);
+		eliminar.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent arg0) {
+			int Texto=Integer.parseInt(elimi.getText());
+				if(clientesArray.size()>=Texto)
+				{
+					((Clientes) clientesArray.get(Texto-1)).setEstado(false);
+				}
+				else
+				{
+					JOptionPane.showMessageDialog(jfM, "Error en la eliminación del producto", "ERROR", JOptionPane.ERROR_MESSAGE);
+				}
+				
+				actualizarClientes();
+			}
+		});
+		PanelClientes.add(eliminar);
+		
+		JButton modificar = new JButton("modificar productos");
+		modificar.setBounds(630, 200, 139,23);
+		JTextField modi = new JTextField();
+		modi.setBounds(800,200,130,23);
+		
+		modificar.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent arg0) {
+				
+				int Texto=Integer.parseInt(modi.getText());
+				modificarCliente(modi.getText());
+				actualizarClientes();
+			}
+		});
+		PanelClientes.add(modi);
+		PanelClientes.add(modificar);*/
+		
+			
 				
 		
     }
@@ -316,6 +429,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 			public void mouseClicked(MouseEvent arg0) {
 				
 				importarTickets();
+				actualizarTickets();
 				
 			}
 		});
@@ -327,7 +441,8 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		{
 			public void mouseClicked(MouseEvent arg0) {
 				
-				 exportarTickets();			
+				 exportarTickets();	
+				 actualizarTickets();
 			}
 		});
 		PanelVentas.add(exportar);
@@ -337,10 +452,30 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		{
 			public void mouseClicked(MouseEvent arg0) {
 				
-				NuevoTicket();			
+				NuevoTicket();	
+				actualizarTickets();
 			}
 		});
 		PanelVentas.add(nuevoTicket);
+		
+		JButton mostrar_text = new JButton("Mostrar");
+		mostrar_text.setBounds(630, 150, 139,23);
+		JTextField mostrar = new JTextField();
+		mostrar.setBounds(800,150,130,23);
+		PanelVentas.add(mostrar_text);
+		PanelVentas.add(mostrar);
+		mostrar_text.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent arg0) {
+				//System.out.println(mostrar.getText());
+				int Texto=Integer.parseInt(mostrar.getText());
+				mostrarTicket(Texto);
+				actualizarTickets();
+			
+			}
+		});
+		
+		
     }
  
  
@@ -432,7 +567,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 	public void importarProducto()
 	{
 		
-		 String ruta=rutaArchivo+"Productos.txt";
+		 String ruta=rutaArchivo+"/Productos.txt";
 		
 		 Productos p;
 	     cantidad c;
@@ -494,7 +629,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		
 		 try {
 			
-			 String ruta=rutaArchivo+"Tickets.txt";
+			 String ruta=rutaArchivo+"/Tickets.txt";
 	            fichero = new FileOutputStream(ruta);
 	            salida = new ObjectOutputStream(fichero);
 	            c=new cantidad(ticketArray.size());
@@ -531,7 +666,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
         ObjectInputStream entrada = null;		     
 
         try {
-        	String ruta=rutaArchivo+"Clientes.txt";
+        	String ruta=rutaArchivo+"/Clientes.txt";
        	 
         	clientesArray.clear();
             ficheroLeer = new FileInputStream(ruta);
@@ -583,7 +718,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
         ObjectInputStream entrada = null;		     
 
         try {
-        	String ruta=rutaArchivo+"Tickets.txt";
+        	String ruta=rutaArchivo+"/Tickets.txt";
        	 
         	ticketArray.clear();
             ficheroLeer = new FileInputStream(ruta);
@@ -940,9 +1075,107 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		frame.add(aceptar);
 		frame.setVisible(true);
 	}
+	public void nuevaFactura(){
+		JFrame frame = new JFrame("TPV");
+		frame.getContentPane().setLayout(null);
+		frame.setBounds(500, 10, 800, 1000);
+		Container contentPane =frame.getContentPane();
+		
+		//Cliente Y BUSCADOR CLIENTE 
+		JLabel cliente_Text=new JLabel("CLIENTE: ");
+		cliente_Text.setBounds(5, 5, 100, 50);
+		frame.add(cliente_Text);
+		JTextField cliente=new JTextField();
+		cliente.setBounds(120, 10, 100, 30);
+		frame.add(cliente);
+			//buscador cliente
+		JLabel Buscador_cliente_Text=new JLabel("Buscador: ");
+		Buscador_cliente_Text.setBounds(300, 5, 100, 50);
+		frame.add(Buscador_cliente_Text);
+		JTextField buscador_cliente=new JTextField();
+		buscador_cliente.setBounds(420, 10, 100, 30);
+		frame.add(buscador_cliente);
+		
+		JTextArea area_Buscador_Cliente= new JTextArea();	
+		area_Buscador_Cliente.setBounds(400, 100, 300, 150);
+		area_Buscador_Cliente.setAutoscrolls(true);
+		frame.add(area_Buscador_Cliente);
+		
+		buscador_cliente.addKeyListener(new KeyAdapter() {
+			@Override
+			
+			public void keyReleased(KeyEvent arg0) {
+				 String cadena= "ID   "+ "Nombre\n";
+		         	Clientes c;
+					Iterator<Clientes> it = clientesArray.iterator();
+					
+					String buscador;
+					
+					if(buscador_cliente.getText().length()==0){
+						
+						buscador="asdasdasdasdasdkiosdhaslkdnasd";
+						cadena="No se encuentra ningún cliente con esa búsqueda";
+					}else{
+						buscador=buscador_cliente.getText();
+					}
+					while(it.hasNext())
+					{
+						c=it.next();
+						if(c.getEstado())
+						{
+							if(c.getNombre().indexOf(buscador)!=-1)
+							{
+								cadena=cadena+c.getId() +"   "+  c.getNombre()+"\n";
+							}
+						}
+					}
+					area_Buscador_Cliente.setText(cadena);
+			}
+			
+		});
+    	 banderaMostrar=false;//si no se muestra los ticket no se 
+		//Fecha
+		JLabel ano_Text=new JLabel("Fecha(Año):");
+		ano_Text.setBounds(5, 40, 100, 50);
+		frame.add(ano_Text);
+		JTextField ano=new JTextField();
+		ano.setBounds(120, 45, 100, 30);
+		frame.add(ano);
+		JButton mostrarDatos= new JButton("Mostrar datos de factura");
+		mostrarDatos.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent arg0) {
+				
+				banderaMostrar=true;
+				
+				//Miramos cada ticket y se comprueba cliente y fecha si esta correcto se introduce en el array
+				
+			}
+		});
+		mostrarDatos.setBounds(10, 90, 300 , 50);
+		frame.add(mostrarDatos);
+		
+		
+		JButton aceptar= new JButton("Aceptar");
+		aceptar.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent arg0) {
+				if(banderaMostrar){
+					frame.setVisible(false);
+				}else{
+					System.out.println("Primero pulse el boton mostrar para saber la cantidad de ticket que se le incluiran en la factura");
+				}
+				
+				
+			}
+		});
+		aceptar.setBounds(10, 700, 770, 40);
+		frame.add(aceptar);
+		frame.setVisible(true);
+	}
 	public void NuevoTicket()
 	{
-		//ticket= new Ticket();
+		
 		ArrayList productosTicket= new ArrayList();
 		
 		JFrame frame = new JFrame("TPV");
@@ -971,22 +1204,29 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		Buscador_cliente_texto.addKeyListener(new KeyAdapter() {
 			@Override
 			
-			public void keyPressed(KeyEvent arg0) {
+			public void keyReleased(KeyEvent arg0) {
 				 String cadena= "ID   "+ "Nombre\n";
 		         	Clientes c;
 					Iterator<Clientes> it = clientesArray.iterator();
+					
+					String buscador;
+					if(Buscador_cliente_texto.getText().length()==0){
+						
+						buscador="asdasdasdasdasdkiosdhaslkdnasd";
+						cadena="No se encuentra ningún producto con esa búsqueda";
+					}else{
+						buscador=Buscador_cliente_texto.getText();
+					}
 					while(it.hasNext())
 					{
 						c=it.next();
 						if(c.getEstado())
 						{
-							if(c.getNombre().indexOf(Buscador_cliente_texto.getText())!=-1)
+							if(c.getNombre().indexOf(buscador)!=-1)
 							{
 								cadena=cadena+c.getId() +"   "+  c.getNombre()+"\n";
 							}
-							
 						}
-						
 					}
 					area_Buscador_Cliente.setText(cadena);
 			}
@@ -1027,17 +1267,27 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 				Buscador_producto.addKeyListener(new KeyAdapter() {
 					@Override
 					
-					public void keyPressed(KeyEvent arg0) {
+					public void keyReleased(KeyEvent arg0) {
 						
 						 String cadena= "ID   "+ "Nombre\n";
 				         	Productos c;
 							Iterator<Productos> it = productosArray.iterator();
+							
+							String buscador;
+							if(Buscador_producto.getText().length()==0){
+								
+								buscador="asdasdasdasdasdkiosdhaslkdnasd";
+								cadena="No se encuentra ningún producto con esa búsqueda";
+							}else{
+								buscador=Buscador_producto.getText();
+							}
 							while(it.hasNext())
 							{
 								c=it.next();
 								if(c.getEstado())
 								{
-									if(c.getDescripcion().indexOf(producto.getText())!=-1)
+									
+									if(c.getDescripcion().indexOf(buscador)!=-1)
 									{
 										cadena=cadena+ c.getCodigo()+"    " +c.getDescripcion() + c.getcantidadStock() +"\n";
 									}
@@ -1068,16 +1318,18 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 						
 						int IdProducto = Integer.parseInt(producto.getText());
 						int cantidadProducto= Integer.parseInt(cantidad.getText());
-						System.out.println( IdProducto  + "   "+cantidadProducto);
+						
 						if(productosArray.size()>= IdProducto && cantidadProducto>0)
 						{
 							
 							productoTicket=(Productos) productosArray.get(IdProducto-1);
 							if(productoTicket.setDisminucionStock(cantidadProducto))
 							{
+								
 								c= new cantidad(cantidadProducto);
+								
 								productosTicket.add(productoTicket);
-								productosTicket.add(cantidadProducto);
+								productosTicket.add(c);
 								cadenaProductosTicket=productoTicket.getDescripcion()+"    \t "+productoTicket.getPrecioConIva() +"\n ";
 								System.out.println("Todo ok ");
 							}
@@ -1117,7 +1369,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 				if(clientesArray.size()> IdCliente)
 				{
 					Ticket ticket= new Ticket((ticketArray.size()+1), (Clientes) clientesArray.get(IdCliente-1));
-					ticket.productos=productosArray;
+					ticket.productos=productosTicket;
 					ticketArray.add(ticket);
 					
 					//areaTicket
@@ -1137,10 +1389,74 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		frame.setVisible(true);
 		
 	}
+	public void mostrarTicket( int indiceTicket)
+	{
+		JFrame ventana2 = new JFrame("TPV");
+		ventana2.getContentPane().setLayout(null);
+		ventana2.setBounds(500, 200, 800, 800);
+		if(ticketArray.size()>=indiceTicket)
+		{
+			String cadena="Código\t Descripción\t Cantidad\t Precio\t IVA\t Importe Total\n";
+			//si esta en el array se muestra el frame 
+			ventana2.setVisible(true);
+			
+			JLabel producto_texto= new JLabel("Ticket nº: "+indiceTicket);
+			producto_texto.setBounds(300, 25, 190,70);
+			producto_texto.setFont(new java.awt.Font("Tahoma", 0, 36)); 
+			ventana2.add(producto_texto);
+			
+			JTextArea area_Ticket= new JTextArea();
+			area_Ticket.setBounds(100, 100, 600,600);
+			
+			ventana2.add(area_Ticket);
+			Ticket T;
+			Iterator<Ticket> it = ticketArray.iterator();
+					//Iterator<Productos> it = ticketArray[(indiceTicket-1)].iterator();
+			int contador=0;
+			
+			while(it.hasNext())
+			{
+				contador++;
+				T=it.next();
+				if(contador==indiceTicket){
+					//cojo el array de productos del ticket
+					Productos p;
+					
+				 int delimitador=T.productos.size();
+				 
+				
+				 double total=0;
+				for(int i=0;i<delimitador;i++){
+					;
+					
+					String nombre= ((Productos) T.productos.get(i)).getDescripcion();
+					Double precio_con_iva= ((Productos) T.productos.get(i)).getPrecioConIva();
+					int iva= ((Productos) T.productos.get(i)).getIva();
+					int codigo= ((Productos) T.productos.get(i)).getCodigo();
+					i++;//para la cantidad
+					//asdasdasd
+					int Cantidad= ((cantidad)T.productos.get(i)).cant;
+					System.out.println(Cantidad);
+					double precio_total_individual=Cantidad*precio_con_iva;
+					cadena=cadena+codigo+"\t"+nombre+"\t"+ +Cantidad +"\t"+precio_con_iva+"\t"+iva+"\t"+precio_total_individual+"\n";
+					total=precio_total_individual+total;
+				}
+				cadena=cadena+"\n\n\t\t\t\tTotal ticket:"+total;					
+				}
+				area_Ticket.setText(cadena);
+				
+			}
+			areaTicket.setText(cadena);
+		
+		}else{
+			//si NO esta en el array mensaje de error
+			System.out.println("NOOOOO en el tamaño de ticket");
+		}
+		
+	}
 	public void actualizarProductos()
 	{
-		 String cadena="Codigo, "
-			 		+ "Descripcion, Precio unitario\n";
+		 String cadena="Codigo, "+ "Descripcion, Precio unitario\n";
 	        
 	      	
 	         	Productos p;
@@ -1185,7 +1501,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 				{
 					c=it.next();
 					
-					cadena=cadena+ c.cliente.getNombre()+"\n";
+					cadena=cadena+ c.cliente.getNombre()+ "  Tamaño array  "+(c.productos.size()/2)+"\n";
 					
 					
 				}
