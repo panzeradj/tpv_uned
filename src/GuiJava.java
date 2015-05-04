@@ -34,11 +34,12 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
     JButton jb1, jb2, jb3, jbP1, jbP2, jbP3;   
     JMenu productosMenu;
     JFrame jfM;
-    ArrayList  productosArray, clientesArray, ticketArray;
+    ArrayList  productosArray, clientesArray, ticketArray,facturaArray;
     JTextArea areaProducto, areaCliente,areaTicket, areaFactura , area_Productos;
     String rutaArchivo="";
     String cadenaProductosTicket;
     boolean banderaMostrar;//para sacar facturas
+    double totalFactura=0;
     public GuiJava(){
     	File fichero = new File("");
     	rutaArchivo=fichero.getAbsolutePath();
@@ -46,6 +47,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
     	productosArray= new ArrayList();
     	clientesArray=new ArrayList();
     	ticketArray=new ArrayList();
+    	facturaArray=new ArrayList();
         jfM = new JFrame("JPanel En Java");  
         jfM.setLayout(null);
  
@@ -329,88 +331,30 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		areaFactura.setBounds(100, 100, 500, 500);
 		areaFactura.setAutoscrolls(true);
 		PanelFacturas.add(areaFactura);
-		
-		/*
-		areaCliente = new JTextArea();
-		areaCliente.setBounds(100, 100, 500, 500);
-		areaCliente.setAutoscrolls(true);
-		PanelClientes.add(areaCliente);
+		JButton exportar= new JButton("exportar facturas");
+		exportar.setBounds(120, 25, 109, 23);
+		exportar.addMouseListener(new MouseAdapter()
+		{
+			public void mouseClicked(MouseEvent arg0) {
+				
+				System.out.println("En exportar facturas");
+				exportarFacturas();
+				 actualizarfacturas();
+			}
+		});
+		PanelFacturas.add(exportar);
 		JButton importar= new JButton("importar clientes");
 		importar.setBounds(10, 25, 109, 23);
 		importar.addMouseListener(new MouseAdapter()
 		{
 			public void mouseClicked(MouseEvent arg0) {
 				
-				importarClientes();
+				importarFacturas();
+				actualizarfacturas();
 				
 			}
 		});
-		PanelClientes.add(importar);
-		
-		
-		JButton exportar= new JButton("exportar clientes");
-		exportar.setBounds(120, 25, 109, 23);
-		exportar.addMouseListener(new MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent arg0) {
-				
-				 exportarClientes();			
-			}
-		});
-		PanelClientes.add(exportar);
-		JButton nuevoCliente= new JButton("nuevoCliente");
-		nuevoCliente.setBounds(220, 25, 109, 23);
-		nuevoCliente.addMouseListener(new MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent arg0) {
-				
-				NuevoCliente();			
-			}
-		});
-		PanelClientes.add(nuevoCliente);
-		
-		JButton eliminar = new JButton("Eliminar");
-		eliminar.setBounds(630, 150, 139,23);
-		JTextField elimi = new JTextField();
-		elimi.setBounds(800,150,130,23);
-		PanelClientes.add(elimi);
-		eliminar.addMouseListener(new MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent arg0) {
-			int Texto=Integer.parseInt(elimi.getText());
-				if(clientesArray.size()>=Texto)
-				{
-					((Clientes) clientesArray.get(Texto-1)).setEstado(false);
-				}
-				else
-				{
-					JOptionPane.showMessageDialog(jfM, "Error en la eliminación del producto", "ERROR", JOptionPane.ERROR_MESSAGE);
-				}
-				
-				actualizarClientes();
-			}
-		});
-		PanelClientes.add(eliminar);
-		
-		JButton modificar = new JButton("modificar productos");
-		modificar.setBounds(630, 200, 139,23);
-		JTextField modi = new JTextField();
-		modi.setBounds(800,200,130,23);
-		
-		modificar.addMouseListener(new MouseAdapter()
-		{
-			public void mouseClicked(MouseEvent arg0) {
-				
-				int Texto=Integer.parseInt(modi.getText());
-				modificarCliente(modi.getText());
-				actualizarClientes();
-			}
-		});
-		PanelClientes.add(modi);
-		PanelClientes.add(modificar);*/
-		
-			
-				
+		PanelFacturas.add(importar);
 		
     }
     public void ventas()
@@ -502,7 +446,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 			
 			 try {
 				
-				 String ruta =rutaArchivo+"Productos.txt";
+				 String ruta =rutaArchivo+"/Productos.txt";
 		            fichero = new FileOutputStream(ruta);
 		            salida = new ObjectOutputStream(fichero);
 		            c=new cantidad(productosArray.size());
@@ -539,7 +483,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		
 		 try {
 			
-			 String ruta=rutaArchivo+"Clientes.txt";
+			 String ruta=rutaArchivo+"/Clientes.txt";
 	            fichero = new FileOutputStream(ruta);
 	            salida = new ObjectOutputStream(fichero);
 	            c=new cantidad(clientesArray.size());
@@ -563,6 +507,95 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 	            }
 	        }
 		 actualizarClientes();
+	}
+	public void exportarFacturas()
+	{
+		FileOutputStream fichero = null;
+        ObjectOutputStream salida = null;
+        Factura p;
+        cantidad c;
+        
+        /*Meter datso en arrayList*/
+         
+        String continuar="si";
+		
+		 try {
+			
+			 String ruta=rutaArchivo+"/Facturas.txt";
+	            fichero = new FileOutputStream(ruta);
+	            salida = new ObjectOutputStream(fichero);
+	            c=new cantidad(facturaArray.size());
+	            salida.writeObject(c);
+	            //System.out.println("exportar "+c.cant);
+	          for(int i=0;i<facturaArray.size();i++)
+	          {
+	        	  salida.writeObject(facturaArray.get(i));
+	          }        
+		 } catch (FileNotFoundException e) {
+	            System.out.println(e.getMessage());
+	        } catch (IOException e) {
+	            System.out.println(e.getMessage());
+	        } finally {
+	            try {
+	                if(fichero!=null) fichero.close();
+	                if(salida!=null) salida.close();
+	            } catch (IOException e) {
+	                System.out.println(e.getMessage());
+	            }
+	        }
+		 
+	}
+	public void importarFacturas()
+	{
+		
+		 String ruta=rutaArchivo+"/Facturas.txt";
+		
+		 Factura p;
+	     cantidad c;
+		FileInputStream ficheroLeer = null;
+       ObjectInputStream entrada = null;
+       
+
+       try {
+
+       	productosArray.clear();
+           ficheroLeer = new FileInputStream(ruta);
+           entrada = new ObjectInputStream(ficheroLeer);
+           c= (cantidad) entrada.readObject();
+           
+           int cantidad=c.cant;
+           
+           while(cantidad>0)
+           {
+           	p = (Factura) entrada.readObject();
+          
+           	facturaArray.add(p);
+           	 cantidad--;
+           }
+          actualizarProductos();
+          
+       } catch (FileNotFoundException e) {
+           System.out.println(e.getMessage());
+          
+       } catch (ClassNotFoundException e) {
+           System.out.println(e.getMessage());
+          
+       } catch (IOException e) {
+           System.out.println(e.getMessage());
+       } finally {
+           try {
+               if (ficheroLeer != null) {
+               	ficheroLeer.close();
+               }
+               if (entrada != null) {
+                   entrada.close();
+               }
+           } catch (IOException e) {
+               System.out.println(e.getMessage());
+               
+           }
+       }
+       actualizarProductos();
 	}
 	public void importarProducto()
 	{
@@ -616,6 +649,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
        }
        actualizarProductos();
 	}
+	
 	public void exportarTickets()
 	{
 		FileOutputStream fichero = null;
@@ -1076,6 +1110,8 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		frame.setVisible(true);
 	}
 	public void nuevaFactura(){
+		
+		ArrayList ticket_factura=new ArrayList();
 		JFrame frame = new JFrame("TPV");
 		frame.getContentPane().setLayout(null);
 		frame.setBounds(500, 10, 800, 1000);
@@ -1105,6 +1141,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 			@Override
 			
 			public void keyReleased(KeyEvent arg0) {
+				
 				 String cadena= "ID   "+ "Nombre\n";
 		         	Clientes c;
 					Iterator<Clientes> it = clientesArray.iterator();
@@ -1133,8 +1170,15 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 			}
 			
 		});
-    	 banderaMostrar=false;//si no se muestra los ticket no se 
+    	 banderaMostrar=true;//si no se muestra los ticket no se 
 		//Fecha
+    	 JTextArea area_Ticket= new JTextArea();
+ 		
+    	 area_Ticket.setBounds(20, 290,750, 400);
+    	 area_Ticket.setAutoscrolls(true);
+    	 area_Ticket.setText("Ticket que se introduciran en la factura");
+     	frame.add(area_Ticket);
+     	
 		JLabel ano_Text=new JLabel("Fecha(Año):");
 		ano_Text.setBounds(5, 40, 100, 50);
 		frame.add(ano_Text);
@@ -1145,11 +1189,66 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		mostrarDatos.addMouseListener(new MouseAdapter()
 		{
 			public void mouseClicked(MouseEvent arg0) {
+				totalFactura=0;
+				String cadenaTicket="Fecha\t Importe total\t\n";
+				ticket_factura.clear();
+				//no hay clienteSystem.out.println("En cliente"+cliente.getText()+"asdasd");
+				if(cliente.getText().equals("")){//No hay cliente
+					//no hay cliente
+					System.out.println("No hay cliente");
+					banderaMostrar=false;
+				}
+				if(ano.getText().equals("")){//No hay cliente
+					System.out.println("No hay año");
+					banderaMostrar=false;
+				}
 				
-				banderaMostrar=true;
-				
-				//Miramos cada ticket y se comprueba cliente y fecha si esta correcto se introduce en el array
-				
+				if(banderaMostrar==true){
+					//Miramos cada ticket y se comprueba cliente y fecha si esta correcto se introduce en el array
+					
+					 String cadena= "ID   "+ "Nombre\n";
+			         	Ticket t;
+						Iterator<Ticket> it = ticketArray.iterator();	
+						while(it.hasNext())
+						{
+							Clientes c;
+							t=it.next();
+							if(t.cliente.getEstado()){
+								int id_cliente=Integer.parseInt(cliente.getText());
+								int id_ano=Integer.parseInt(ano.getText());
+								if(t.cliente.getId()==id_cliente && id_ano==t.ano){
+									ticket_factura.add(t);
+									
+									System.out.println("Ticket añadido");
+									Productos p;
+									
+									 int delimitador=t.productos.size();
+									 
+									
+									 double total=0;
+									for(int i=0;i<delimitador;i++){
+										
+										String nombre= ((Productos) t.productos.get(i)).getDescripcion();
+										Double precio_con_iva= ((Productos) t.productos.get(i)).getPrecioConIva();
+										int iva= ((Productos) t.productos.get(i)).getIva();
+										int codigo= ((Productos) t.productos.get(i)).getCodigo();
+										i++;//para la cantidad
+										//asdasdasd
+										int Cantidad= ((cantidad)t.productos.get(i)).cant;
+										System.out.println(Cantidad);
+										double precio_total_individual=Cantidad*precio_con_iva;
+										cadena=cadena+codigo+"\t"+nombre+"\t"+ +Cantidad +"\t"+precio_con_iva+"\t"+iva+"\t"+precio_total_individual+"\n";
+										total=precio_total_individual+total;
+										
+									}//fin for
+									totalFactura=totalFactura+total;
+									System.out.println(totalFactura);
+									cadenaTicket=cadenaTicket+""+t.dia+"/"+t.mes+"/"+t.ano+"\t"+total+"\n";
+								}
+							}
+						}
+						area_Ticket.setText(cadenaTicket);
+				}
 			}
 		});
 		mostrarDatos.setBounds(10, 90, 300 , 50);
@@ -1162,12 +1261,20 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 			public void mouseClicked(MouseEvent arg0) {
 				if(banderaMostrar){
 					frame.setVisible(false);
+					//Creamos la factura
+					int id_cli=Integer.parseInt(cliente.getText());
+					id_cli--;
+					System.out.println("//////////////////////");
+					System.out.println((facturaArray.size()+1));
+						Factura factura= new Factura(ticket_factura,(Clientes)clientesArray.get(id_cli), (facturaArray.size()+1),totalFactura);
+					//añadimos la factura
+						facturaArray.add(factura);
+						actualizarfacturas();
 				}else{
 					System.out.println("Primero pulse el boton mostrar para saber la cantidad de ticket que se le incluiran en la factura");
-				}
-				
-				
+				}				
 			}
+			
 		});
 		aceptar.setBounds(10, 700, 770, 40);
 		frame.add(aceptar);
@@ -1427,7 +1534,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 				
 				 double total=0;
 				for(int i=0;i<delimitador;i++){
-					;
+					
 					
 					String nombre= ((Productos) T.productos.get(i)).getDescripcion();
 					Double precio_con_iva= ((Productos) T.productos.get(i)).getPrecioConIva();
@@ -1443,8 +1550,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 				}
 				cadena=cadena+"\n\n\t\t\t\tTotal ticket:"+total;					
 				}
-				area_Ticket.setText(cadena);
-				
+				area_Ticket.setText(cadena);	
 			}
 			areaTicket.setText(cadena);
 		
@@ -1452,13 +1558,10 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 			//si NO esta en el array mensaje de error
 			System.out.println("NOOOOO en el tamaño de ticket");
 		}
-		
 	}
 	public void actualizarProductos()
 	{
 		 String cadena="Codigo, "+ "Descripcion, Precio unitario\n";
-	        
-	      	
 	         	Productos p;
 				Iterator<Productos> it = productosArray.iterator();
 				while(it.hasNext())
@@ -1474,9 +1577,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 	}
 	public void actualizarClientes()
 	{
-		 String cadena="Nombre\n";
-	        
-	      	
+		 String cadena="Nombre\n";	      	
 	         	Clientes c;
 				Iterator<Clientes> it = clientesArray.iterator();
 				while(it.hasNext())
@@ -1507,5 +1608,22 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 				}
 				areaTicket.setText(cadena);
 	}
-
+	public void actualizarfacturas()
+	{
+		
+		 String cadena="Cliente\t Fecha\t  Total\n";
+	        
+	      	
+		 Factura c;
+				Iterator<Factura> it = facturaArray.iterator();
+				while(it.hasNext())
+				{
+					c=it.next();
+					
+					cadena=cadena+""+c.cliente.getNombre()+" "+c.cliente.getApellido()+"\t"+c.dia+"/"+c.mes+"/"+c.ano+"\t"+c.total+"\n";
+					
+					
+				}
+				areaFactura.setText(cadena);
+	}
 }
