@@ -453,6 +453,7 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 		});
 		ProductosMasVendidos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
 				JFrame frame = new JFrame("TPV");
 				frame.getContentPane().setLayout(null);
 				frame.setBounds(500, 200, 600, 600);
@@ -467,13 +468,12 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 				JLabel Fecha_posterior_Text=new JLabel("Fecha posterior(2015/04/04 año/mes/dia");
 				Fecha_posterior_Text.setBounds(10, 60, 400, 50);
 				frame.add(Fecha_posterior_Text);
+			
 				
-				
-				
+			
 				JTextField Fecha_posterior= new JTextField();
 				Fecha_posterior.setBounds(350, 75, 100, 25);
 				frame.add(Fecha_posterior);
-				
 				
 			
 				JButton aceptar= new JButton("ACEPTAR");
@@ -490,95 +490,99 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 						if(partes_anterior.length==3 && partes_siguiente.length==3){
 							if(partes_anterior[0].length()==4 && partes_anterior[1].length()==2 && partes_anterior[2].length()==2 && partes_siguiente[0].length()==4 && partes_siguiente[1].length()==2 && partes_siguiente[2].length()==2){
 								if(anterior.compareTo(siguiente) < 0){
-											JFrame VENTANA2 = new JFrame("Listado clientes/ventas");
-											VENTANA2.getContentPane().setLayout(null);
-											VENTANA2.setBounds(500, 200, 600, 600);
-											VENTANA2.setVisible(true);
-											frame.setVisible(false);
-											JTextArea area_venana2=new JTextArea();
-											area_venana2.setBounds(15, 15, 550, 550);
-											VENTANA2.add(area_venana2);
-											//Primero miro todos los clientes
-											id_cliente=Integer.parseInt(cliente.getText());
-											Clientes c;
-											Iterator<Clientes> it = clientesArray.iterator();
-											String cadena="";
-											while(it.hasNext())
+									JFrame VENTANA2 = new JFrame("Listado clientes/ventas");
+									VENTANA2.getContentPane().setLayout(null);
+									VENTANA2.setBounds(500, 200, 600, 600);
+									VENTANA2.setVisible(true);
+									frame.setVisible(false);
+									JTextArea area_venana2=new JTextArea();
+									area_venana2.setBounds(15, 15, 550, 550);
+									VENTANA2.add(area_venana2);
+									//Creo array con el codigo de producto size+1
+									int b[] = new int[productosArray.size()+1];
+									for(int i=0;i<productosArray.size()+1;i++){
+										b[i]=0;
+									}
+									String cadena="";
+											cadena=cadena+ "Producto\t Cantidad\t Posición\n ";
+											//recorro el array de ticket 
+											Ticket t;
+											Iterator<Ticket> ct = ticketArray.iterator();
+											while(ct.hasNext())
 											{
+												t=ct.next();
+												//miro la fecha del ticekt y total
+												int dia=t.dia;
+												int mes=t.mes;
+												int ano=t.ano;
+												String fecha=""+ano+"/"+mes+"/"+dia;
 												
-												c=it.next();
-												if(c.getId()==id_cliente){
-													int id=c.getId();
-													String nombre=c.getNombre()+" "+c.getApellido();
-													cadena=cadena+ nombre+"\n ";
-													cadena=cadena+"Fecha\t"+"Total\n";
-													//recorro el array de ticket y solo saco los que son de este cliente
-													Ticket t;
-													Iterator<Ticket> ct = ticketArray.iterator();
-													while(ct.hasNext())
-													{
-														t=ct.next();
-														//miro la fecha del ticekt y total
-														int dia=t.dia;
-														int mes=t.mes;
-														int ano=t.ano;
-														String fecha=""+ano+"/"+mes+"/"+dia;
-														if(dia<10){
-															if(mes<10){
-															 fecha=""+ano+"/0"+mes+"/0"+dia;
-															}else{
-																 fecha=""+ano+"/"+mes+"/0"+dia;
-															}
-														}
-														if(mes<10){
-															if(dia<10){
-															 fecha=""+ano+"/0"+mes+"/0"+dia;
-															}else{
-																 fecha=""+ano+"/0"+mes+"/"+dia;
-															}
-														}
-														
-														
-														boolean bandera=false;//comprobador de fechas
-														
-														if((anterior.compareTo(fecha) <= 0) && siguiente.compareTo(fecha) >= 0){
-															bandera=true;
-															
-														}
-														if(t.cliente.getId()==c.getId())
-														{
-															if(bandera){//el ticket esta en la fecha dadaa
-																System.out.println("en ticket");
-																Productos p;
-																 int delimitador=t.productos.size();
-																 double total=0;
-																for(int i=0;i<delimitador;i++){
-																	Double precio_con_iva= ((Productos) t.productos.get(i)).getPrecioConIva();
-																	int iva= ((Productos) t.productos.get(i)).getIva();
-																	int codigo= ((Productos) t.productos.get(i)).getCodigo();
-																	i++;//para la cantidad
-																	int Cantidad= ((cantidad)t.productos.get(i)).cant;
-																	double precio_total_individual=Cantidad*precio_con_iva;
-																	total=precio_total_individual+total;
-																	
-																}
-																cadena=cadena+""+ano+"/"+mes+"/"+dia+"\t"+total+"\n";
-															}
-														}
-														
-														
-													}
+												boolean bandera=false;//comprobador de fechas
+												
+												if((anterior.compareTo(fecha) <= 0) && siguiente.compareTo(fecha) >= 0){
+													bandera=true;
 													
 												}
+													if(bandera){//el ticket esta en la fecha dada
+														System.out.println("en ticket");
+														Productos p;
+														 int delimitador=t.productos.size();
+														 double total=0;
+														for(int i=0;i<delimitador;i++){
+															
+															
+															int codigoProductos= ((Productos) t.productos.get(i)).getCodigo();
+															i++;//para la cantidad
+															int Cantidad= ((cantidad)t.productos.get(i)).cant;
+														b[codigoProductos]=b[codigoProductos]+Cantidad;
+														}
+														//cadena=cadena+""+ano+"/"+mes+"/"+dia+"\t"+total+"\n";
+													}	
+											}
+											int comparadorCantidad[] = new int[productosArray.size()+1];
+											for(int i=1;i<productosArray.size()+1;i++){
+												comparadorCantidad[i]=b[i];
+											}
+											//ahora ordeno las cantidades
+											int cuentaintercambios=0;
+											for (boolean ordenado=false;!ordenado;){
+									            for (int i=1;i<comparadorCantidad.length-1;i++){
+									                if (comparadorCantidad[i]>comparadorCantidad[i+1]){
+									                    //Intercambiamos valores
+									                    int variableauxiliar=comparadorCantidad[i];
+									                    comparadorCantidad[i]=comparadorCantidad[i+1];
+									                    comparadorCantidad[i+1]=variableauxiliar;
+									                    //indicamos que hay un cambio
+									                    cuentaintercambios++;
+									                }
+									            }
+									            //Si no hay intercambios, es que esta ordenado.
+									            if (cuentaintercambios==0){
+									                ordenado=true;
+									            }
+									            //Inicializamos la variable de nuevo para que empiece a contar de nuevo
+									            cuentaintercambios=0;
+									        }
+											//System.out.println(cuentaintercambios);
+											/*for(int i=1;i<productosArray.size()+1;i++){
+												System.out.println(i+"  "+b[i]);
+											}*/
+											//comparo las cantidades y lo imprimo en la cadena 
+											cadena="Posicion\tCódigo\tDescripción\tCantidad\n";
+											for(int i=productosArray.size();i>=1;i--){
+												for(int a=1;a<productosArray.size()+1;a++){
+													if(comparadorCantidad[i]==b[a]){
+														Productos p=(Productos) productosArray.get(a-1);
+														System.out.println((productosArray.size()+1-i)+"\t "+p.getCodigo()+"\t "+p.getDescripcion() +"\t "+comparadorCantidad[i] +"\n" );
+														cadena=cadena+(productosArray.size()+1-i)+"\t "+p.getCodigo()+"\t "+p.getDescripcion() +"\t "+comparadorCantidad[i] +"\n" ; 
+													}
+												}
 													
-												
 											}
 											area_venana2.setText(cadena);
 											
+										}
 											
-									}else{
-									JOptionPane.showMessageDialog(jfM, "Error, no has introducido las fechas correctamente", "ERROR", JOptionPane.ERROR_MESSAGE);
-								}
 							}else{
 								JOptionPane.showMessageDialog(jfM, "Error, no has introducido las fechas correctamente", "ERROR", JOptionPane.ERROR_MESSAGE);
 							}
@@ -590,12 +594,8 @@ public class GuiJava implements ActionListener{//implementando el listener de ev
 				frame.setVisible(true);
 				
 			}			
-				
-						
 		});
-
 		jfM.setExtendedState(jfM.MAXIMIZED_BOTH);
-    
     }
  
     public void productos(){
